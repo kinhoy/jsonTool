@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- 
+                                                         .;'                                                                            `!'                                                                                                         .
+                                               |##|       ;##$` `$&'                        '&$` ````````````'%#|                        `$#%.                     '%:     .;|||||||||||||||||%@##|                                                 .
+                                              ;#&'       .%#%.    |#@:           '|!:'|#@!''''''.            .%#;               .$##!    `$#;                        |#$`                                                                           .
+                             ;;              '&$`        ;#$`     .%|                 |#!          :|`       '&$`               !##;     `$#;                         |#%.     '&@%|||||||||&#@:                                                    .
+     !@#########################|           `$%.   `$&' '&@!```````````!@#@;         '&%.          !#!       ;#%.              '&#;      `$#;        !#%.              .       `$&'         !#!                                                     .
+                                           .%|    .%#%. %#$`     ;#!                 |@:           %@:       !#!              `$#%''''''';&#%''''''''''''.                     `$&'         !#!                                                     .
+                                          `%!     |#|  !##$`     ;#!                :@!    `.     `$&`      .%@:             .%@:        `$#;                                  '&#$%%%%%%%%%@#|                                                     .
+                                         |#&%$@####;  ;%!&$`     ;#!    ;;         `$#&%%%$@#|    '&%.      `$&`            .%$`         `$#;                   '||||%&##|                                                                          .
+                                          !%`  .$&'  :!.'&################&'      .%##:   .%&'    ;#!       :@%.           `%;           `$#;                         :#|    '&&||||||||||||||&##!                                                  .
+                                              :@|   ::  '&$`     ;#!              |||@:   .%&'   :@#&|||||||&#&||&#@:     `'             `$#;          .%|            :#|    '&%.     !#;     '&|                                                   .
+                                            .%&'        '&$`     ;#!            .!: !@:   .%&'     .             ;#!     `!||||||||||||||%@#&|||||||||&####|          :#|    `$%.     !#;     '&|                                                   .
+                                          .%#|';|&#$:   '&$`     ;#!   `$!          !@:   .%&'                   |@:                     `$#;                         :#|    `$#################%.                                                  .
+                                         .%###$'        '&#$%%%%%&#@%%%%%%|`        !@:   .%&'             !#&' `$&'                     `$#;                         :#|    `$%.     !#;     '&%.                                                  .
+                               :@&'              .;&&:  '&$`     ;#!                !#&%%%$@&'                  ;#!                      `$#;                        !&%%;   '&@$%%%%%%%%%%%%%&#%.                                                  .
+ ;@################################&'      `|@##$'      '&$`     ;#!     !&:        !#:   .%$`                 .%#;                      `$#;                    .|#&'   .%&:`:.               .                                                    .
+                                          '@#!          '&#$%%%%%%%%%%%%%%%%;       |#:                  :$#@$%@#%.                      `$#;                   .%@:        ;@##@%!;:'``....``'::;!%!.                                              .
+                                                        '&$`                                                `$##!                        '&#!                                   `!%&#############&'                                                 .
+ -->
+
+<head>
+    <meta charset="UTF-8">
+    <title>JSONtool</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+    <script src="https://cdn.staticfile.org/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./jslint.js"></script>
+    <script>
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?4e38e4bff29e6b9682548db10cb5351c";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="jumbotron">
+            <div style="padding: 100px 100px 10px;">
+                <h1 style="text-align: center;">JSON tool</h1>
+                <form class="bs-example bs-example-form" name="jsonForm" role="form">
+                    <p class="text-info text-center" id='other_tips' style="display:none"></p>
+                    <input type="text" class="form-control" style="display:none" readonly="readonly" name="name"
+                        id="nn">
+                    <div class="input-group" style="text-align:center">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" onclick="formatJSONG()">格式化</button>
+                            <button type="button" class="btn btn-default" onclick="showHighLight()">高亮 / 编辑</button>
+                            <button type="button" class="btn btn-default" onclick="compress()">压缩</button>
+                            <button type="button" id="cpy_btn" class="btn btn-default" onclick="copy()">拷贝</button>
+                            <p style="font-size:17px" title="勾选后自动从复杂文本中寻找合法JSON数据"><input type="checkbox"
+                                    id="autoCut" /> AUTO</p>
+                        </span>
+                    </div>
+                </form>
+            </div>
+            <pre id="out_pre" style="display:none" onclick="edited(1)"></pre>
+            <div id="error_msg" style="display:none">
+                <div>
+                    <span>编辑区</span>
+                    <textarea id="error_tips" oninput="edited(2)"></textarea>
+                </div>
+            </div>
+            <div class="alert-danger alert" id="jsonlintBox" style="display:none">
+                <i id="jsonlintIcon"></i>
+                <pre class="content" id="jsonlintResult"></pre>
+            </div>
+            <p class="text-info text-center" id='tips' style="display:none">点击编辑或直接粘贴新数据</p>
+        </div>
+    </div>
+    <div id="backtotop">
+        <button type="button" id="scrollBtn" class="btn btn-default" onclick="scrollBack()">回到顶部</button>
+        <button type="button" class="btn btn-default" onclick="formatJSONG()">格式化</button>
+        <button type="button" class="btn btn-default" onclick="showHighLight()">高亮 / 编辑</button>
+        <button type="button" class="btn btn-default" onclick="compress()">压缩</button>
+        <button type="button" id="cpy_btn" class="btn btn-default" onclick="copy()">拷贝</button>
+    </div>
+    <a href="https://gitee.com/kinhoy" target="_blank">
+        <div id="footer">Copyright © 2020 KINHOY</div>
+    </a>
+</body>
+
+</html>
+<script>
+    show_other_tips("Ctrl/Command+V粘贴JSON数据");
+    $(window).scroll(function () {
+        // 当页面滚动条的垂直偏移超过100时显示，否则隐藏
+        if ($(window).scrollTop() > 100) {
+            $("#backtotop").fadeIn();  //fadeIN，fadeOut时渐入渐出
+        } else {
+            $("#backtotop").fadeOut();
+        }
+    });
+    function scrollBack() {//点击按钮时回到顶部，速度位500
+        $("body,html").animate({
+            scrollTop: 0
+        }, 500);
+    }
+    //0 未修改 1 格式化后的修改 2 出错修改
+    var isEdit = 0;
+    function edited(flag) {
+        //console.log("big boss world is change -", flag);
+        isEdit = flag;
+        var string = jsonForm.name.value;
+        if (isEdit === 1) {
+            string = delHtmlTag(document.getElementById('out_pre').innerHTML);
+        } else if (isEdit === 2) {
+            string = delHtmlTag(document.getElementById('error_tips').value);
+        }
+        jsonForm.name.value = string;
+        return string == null ? "" : string;
+    }
+    function delHtmlTag(str) {
+        return str.toString().replace(/<[^>]+>/g, '');//去掉所有的html标记
+    }
+    document.addEventListener('paste', function (evt) {
+        document.getElementById('nn').value = evt.clipboardData.getData('text/plain');
+        isEdit = 0;
+        formatJSONG();
+    });
+    function displayShowUI() {
+        var ui = document.getElementById("tips");
+        ui.style.display = "";//display为空的话会好使，为block会使后边的空间换行
+        ui = document.getElementById("out_pre");
+        ui.style.display = "";
+    }
+    function hideShowUI() {
+        var ui = document.getElementById("tips");
+        ui.style.display = "none";
+        ui = document.getElementById("out_pre");
+        ui.style.display = "none";
+    }
+    function show_other_tips(msg) {
+        var ui = document.getElementById("other_tips");
+        ui.innerHTML = msg;
+        ui.style.display = "";
+        setTimeout(function () { ui.style.display = "none" }, 1500);
+    }
+    function show_error_tips(error, error_msg) {
+        console.log("now error is ", error);
+        document.getElementById("jsonlintResult").innerHTML = error;
+        document.getElementById("jsonlintBox").style.display = "";
+        error_msg = error_msg.replace(/\s/g, "").replace(/\{/g, "\n{\n").replace(/\,/g, ",\n").replace(/\}/g, "\n}\n").replace(/\:/g, "  :  ").replace(/\[/g, "\n[\n").replace(/\]/g, "\n]\n").replace(/\(/g, "\n(\n").replace(/\)/g, "\n)\n");
+        var ui = document.getElementById("error_msg");
+        ui.style.display = "";
+        ui = document.getElementById("error_tips");
+        ui.value = error_msg;
+        isEdit = 2;
+    }
+    function hide_error_tips() {
+        var ui = document.getElementById("error_msg");
+        ui.style.display = "none";
+        ui = document.getElementById("jsonlintBox");
+        ui.style.display = "none";
+    }
+    function copy() {
+        var val;
+        if (isEdit == 0 || isEdit == 1) {
+            val = document.getElementById('out_pre');
+            window.getSelection().selectAllChildren(val);
+        } else {
+            val = document.getElementById('error_tips');
+            val.select();
+        }
+        document.execCommand("Copy");
+        var ui = document.getElementById("cpy_btn");
+        ui.innerHTML = "已拷贝";
+        setTimeout(function () {
+            ui.innerHTML = "拷贝";
+        }, 1000);
+        //thanks https://blog.csdn.net/qq_32963841/article/details/93052408
+    }
+
+    //压缩
+    function compress() {
+        var string = edited(isEdit);
+        hide_error_tips();
+        if (string == '') {
+            show_other_tips("请粘贴要压缩的JSON字符串");
+        } else {
+            displayShowUI();
+            isEdit = 0;
+            //去掉所有的换行符
+            string = string.replace(/\r\n/g, "")
+            string = string.replace(/\n/g, "");
+
+            //去掉所有的空格（中文空格、英文空格都会被替换）
+            string = string.replace(/\s/g, "");
+            document.getElementById('out_pre').innerText = string;
+        }
+    }
+
+    // 格式化json字符串
+    function formatJSONG() {
+        jsonStr = edited(isEdit);
+        if (isEdit == 0) {
+            if (jsonStr != '') {
+                displayShowUI();
+                hide_error_tips();
+            }
+        }
+        if (jsonStr == '') {
+            show_other_tips("请粘贴要转化的JSON字符串");
+        } else {
+            try {
+                var obj = sortObjByKey(jsonlint.parse(jsonStr));
+                var result = JSON.stringify(obj, null, 4);
+                document.getElementById('out_pre').innerText = result;
+                displayShowUI();
+                hide_error_tips();
+                isEdit = 1;
+            } catch (e) {
+                show_other_tips("格式有误");
+                var needAutoCut = $('#autoCut').is(':checked');
+                if (needAutoCut) {
+                    var tryFindJson = autoFindJson(jsonStr);
+                    if (tryFindJson != null) {
+                        show_other_tips("自动在文本中找到合法JSON");
+                        return;
+                    }
+                }
+                show_error_tips(e, jsonStr);
+                hideShowUI();
+            }
+        }
+    }
+    //高亮
+    function showHighLight() {
+        $('#out_pre').html(syntaxHighlight());
+    }
+    function syntaxHighlight() {
+        var json = jsonForm.name.value;
+        json = edited(isEdit);
+        if (json == '') {
+            show_other_tips("请输入粘贴要高亮的JSON字符串");
+            return;
+        }
+        if (typeof json != 'string') {
+            json = JSON.stringify(json, undefined, 4);
+        }
+        try {
+            displayShowUI();
+            hide_error_tips();
+            jsonlint.parse(json);
+            json = JSON.stringify(JSON.parse(json), null, 4);
+            isEdit = 1;
+        } catch (e) {
+            show_other_tips("格式有误");
+            show_error_tips(e, json);
+            hideShowUI();
+            return;
+        }
+        //渲染样式
+        return beautify(json);
+    }
+
+    function beautify(json) {
+        json = json.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+        return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+            var cls = 'number';
+            if (/^"/.test(match)) {
+                if (/:$/.test(match)) {
+                    cls = 'key';
+                } else {
+                    cls = 'string';
+                }
+            } else if (/true|false/.test(match)) {
+                cls = 'boolean';
+            } else if (/null/.test(match)) {
+                cls = 'null';
+            }
+            return '<span contenteditable="true" class="' + cls + '">' + match + '</span>';
+        });
+    }
+
+    //自动查找合法的JSON字符串
+    function autoFindJson(errorJson) {
+        var pre = -1, last = -1;
+        var count = 0;
+        for (index in errorJson) {
+            if (count === 0 && errorJson[index] === "{") {
+                pre = index;
+                count = 1;
+            } else if (errorJson[index] === "}") {
+                last = index;
+            }
+        }
+        if (pre === -1 || last === -1) {
+            //console.log("CANNOT FIND JSON");
+            return null;
+        }
+        //console.log("I FIND SOME STRING MAYBE JSON !!!");
+        last = parseInt(last) + 1;
+        var cutedJson = errorJson.slice(pre, last);
+        //console.log("after cut ---", cutedJson);
+        try {
+            var obj = sortObjByKey(jsonlint.parse(cutedJson));
+            var testChange = JSON.stringify(obj, null, 4);
+            //console.log("FIND JSON !!!", testChange);
+            document.getElementById('out_pre').innerText = testChange;
+            displayShowUI();
+            hide_error_tips();
+            isEdit = 1;
+            return testChange;
+        } catch (e) {
+            console.log("----------------------------------------------");
+            console.log("JSON格式解析错误:");
+            var errIndex = parseInt(e.message.replace(/[^0-9]/ig, "")) - 1;
+            var begainStr = errIndex - 5 <= 0 ? 0 : errIndex - 5;
+            var endStr = errIndex + 10 > errorJson.length ? errorJson.length : errIndex + 10;
+            console.log(errorJson.slice(begainStr, endStr));
+            var point = '';
+            for (i = 0; i < 5; i++) {
+                point += ' ';
+            }
+            point += '^';
+            console.log(point);
+            console.log("----------------------------------------------");
+        }
+        return null;
+    }
+    //JSON串按key值进行排序
+    function sortObjByKey(obj) {
+        var keys = Object.keys(obj).sort();
+        console.log('sorted key: ',keys);
+        var newObj = {}
+        for (var i = 0; i < keys.length; i++) {
+            var index = keys[i];
+            newObj[index] = obj[index];
+            if(typeof obj[keys[i]] === 'object' && null != obj[index]){
+                newObj[index] = sortObjByKey(obj[index]);
+            }
+        }
+        return newObj;
+    }
+
+</script>
+<style>
+    #backtotop {
+        float: right;
+        text-align: center;
+        display: none;
+        clear: both;
+        position: fixed;
+        bottom: 5%;
+        right: 1%;
+        cursor: pointer;
+    }
+
+    pre {
+        outline: 1px solid #ccc;
+        padding: 5px;
+        margin: 5px;
+        /* white-space: pre-wrap;
+        word-wrap: break-word; */
+        white-space: pre-wrap;
+        /* css-3 */
+        white-space: -moz-pre-wrap;
+        /* Mozilla, since 1999 */
+        white-space: -pre-wrap;
+        /* Opera 4-6 */
+        white-space: -o-pre-wrap;
+        /* Opera 7 */
+        word-wrap: break-word;
+        /* Internet Explorer 5.5+ */
+        word-break: break-all;
+        overflow: hidden;
+    }
+
+    .string {
+        color: green;
+    }
+
+    .number {
+        color: darkorange;
+    }
+
+    .boolean {
+        color: blue;
+    }
+
+    .null {
+        color: magenta;
+    }
+
+    .key {
+        color: red;
+    }
+
+    #footer {
+        height: 40px;
+        line-height: 40px;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        text-align: center;
+        background: #fff;
+        color: #333;
+        font-family: Arial;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    textarea {
+        width: 100%;
+        height: 500px;
+    }
+</style>
